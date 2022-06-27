@@ -1,5 +1,5 @@
 use bevy::{prelude::*, window::PresentMode};
-use crate::*;
+use sly_camera_controller::*;
 
 fn main() {
     App::new()
