@@ -4,14 +4,13 @@ use std::f32::consts::{FRAC_PI_2};
 use bevy::{
     input::{mouse::MouseMotion, Input},
     prelude::*,
-    window::Windows, transform::TransformSystem,
+    window::Windows,
 };
 pub struct CameraControllerPlugin;
 
 impl Plugin for CameraControllerPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_system_to_stage( CoreStage::PostUpdate, setup_camera_controller.after(TransformSystem::TransformPropagate))
-            .add_system_to_stage( CoreStage::PostUpdate, update_camera_controller.after(setup_camera_controller));
+        app.add_system_to_stage( CoreStage::PostUpdate, update_camera_controller);
     }
 }
 
@@ -41,7 +40,7 @@ impl Default for CameraController {
     fn default() -> Self {
         Self {
             enabled: true,
-            sensitivity: 0.08,
+            sensitivity: 0.1,
             key_forward: KeyCode::W,
             key_back: KeyCode::S,
             key_left: KeyCode::A,
@@ -59,18 +58,6 @@ impl Default for CameraController {
             position_smoothness: 1.0,
             rotation_smoothness: 100.0,
         }
-    }
-}
-
-fn setup_camera_controller(
-    mut query: Query<(&GlobalTransform, &mut CameraController), (Added<CameraController>, With<Camera>)>,
-) {
-    for (transform, mut controller) in query.iter_mut() {
-        // TODO: pretty sure controller uses of pitch and yaw is flipped
-        let (yaw, pitch, _roll) = yaw_pitch_roll(transform.rotation);
-        controller.pitch = pitch;
-        controller.yaw = yaw;
-        //info!("pitch: {}, yaw: {}", pitch, yaw);
     }
 }
 
@@ -149,31 +136,15 @@ fn update_camera_controller(
                 }
             }
     
-            if mouse_delta != Vec2::ZERO {
-                
-                // TODO: This is a bit hacky, but it works for now, 
-                // Apply look update
-                let (pitch, yaw) = (
-                    (mouse_delta.y * controller.sensitivity).to_radians(),
-                    (mouse_delta.x * controller.sensitivity).to_radians(),
-                );
-                controller.pitch = (controller.pitch - pitch).clamp(-FRAC_PI_2, FRAC_PI_2);
-                controller.yaw -= yaw;
-                transform.rotation = Quat::from_axis_angle(Vec3::Y, controller.yaw)
-                * Quat::from_axis_angle(Vec3::X, controller.pitch);
+            if mouse_delta != Vec2::ZERO {                
+                let (mut yaw, mut pitch, _roll) =  transform.rotation.to_euler(EulerRot::YXZ);
+                yaw -= mouse_delta.x * controller.sensitivity * time.delta_seconds();
+                pitch -= mouse_delta.y * controller.sensitivity * time.delta_seconds();
+
+                let pitch = pitch.clamp(-FRAC_PI_2, FRAC_PI_2);
+                transform.rotation = Quat::from_euler(EulerRot::YXZ, yaw, pitch, 0.0)
+                                
             }
         }
     }
-}
-
-// from https://docs.rs/bevy-inspector-egui/0.6.1/src/bevy_inspector_egui/impls/quat.rs.html
-#[allow(clippy::many_single_char_names)]
-fn yaw_pitch_roll(q: Quat) -> (f32, f32, f32) {
-    let [x, y, z, w] = *q.as_ref();
-
-    let yaw = (2.0 * (y * z + w * x)).atan2( w * w - x * x - y * y + z * z);
-    let pitch = (-2.0 * (x * z - w * y)).asin();
-    let roll = (2.0 * (x * y + w * z)).atan2( w * w + x * x - y * y - z * z);
-
-    (yaw, pitch, roll)
 }
