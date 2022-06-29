@@ -40,7 +40,7 @@ impl Default for CameraController {
     fn default() -> Self {
         Self {
             enabled: true,
-            sensitivity: 0.1,
+            sensitivity: 0.2,
             key_forward: KeyCode::W,
             key_back: KeyCode::S,
             key_left: KeyCode::A,
