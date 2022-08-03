@@ -32,8 +32,6 @@ pub struct CameraController {
     pub pitch: f32,
     pub yaw: f32,
     pub velocity: Vec3,
-    pub position_smoothness: f32,
-    pub rotation_smoothness: f32,
 }
 
 impl Default for CameraController {
@@ -55,8 +53,6 @@ impl Default for CameraController {
             pitch: 0.0,
             yaw:  0.0,
             velocity: Vec3::ZERO,
-            position_smoothness: 1.0,
-            rotation_smoothness: 100.0,
         }
     }
 }

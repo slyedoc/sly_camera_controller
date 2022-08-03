@@ -37,13 +37,21 @@ fn setup(
         })
         .insert(Name::new("Ground"));
 
+    // light
+    commands.spawn_bundle(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
+        ..default()
+    });
     // camera
     commands
-        .spawn_bundle(PerspectiveCameraBundle {
+        .spawn_bundle(Camera3dBundle {
             transform: Transform::from_xyz(0.0, 10.0, -50.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         })
-        // Add our controller
         .insert(CameraController::default());
-    
 }
