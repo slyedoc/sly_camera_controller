@@ -1,12 +1,8 @@
-use bevy::{prelude::*, window::PresentMode};
+use bevy::prelude::*;
 use sly_camera_controller::*;
 
 fn main() {
     App::new()
-        .insert_resource(WindowDescriptor {
-            present_mode: PresentMode::Fifo,
-            ..default()
-        })
         .add_plugins(DefaultPlugins)
         .add_plugin(CameraControllerPlugin)
         .add_startup_system(setup)
@@ -19,14 +15,14 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // light
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         transform: Transform::from_xyz(50.0, 50.0, 50.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
 
     // ground
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             transform: Transform::from_xyz(0.0, 0.0, 0.0),
             mesh: meshes.add(Mesh::from(shape::Plane { size: 100.0 })),
             material: materials.add(StandardMaterial {
@@ -38,7 +34,7 @@ fn setup(
         .insert(Name::new("Ground"));
 
     // light
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             intensity: 1500.0,
             shadows_enabled: true,
@@ -49,7 +45,7 @@ fn setup(
     });
     // camera
     commands
-        .spawn_bundle(Camera3dBundle {
+        .spawn(Camera3dBundle {
             transform: Transform::from_xyz(0.0, 10.0, -50.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..default()
         })

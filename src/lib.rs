@@ -4,7 +4,7 @@ use std::f32::consts::{FRAC_PI_2};
 use bevy::{
     input::{mouse::MouseMotion, Input},
     prelude::*,
-    window::Windows,
+    window::{Windows, CursorGrabMode},
 };
 pub struct CameraControllerPlugin;
 
@@ -118,12 +118,12 @@ fn update_camera_controller(
             let mut mouse_delta = Vec2::ZERO;
             if mouse_input.pressed(controller.mouse_look) {
                 #[cfg(not(target="wasm32"))]
-                window.set_cursor_lock_mode(true);
+                window.set_cursor_grab_mode(CursorGrabMode::Confined);
                 window.set_cursor_visibility(false);
             }
             if mouse_input.just_released(controller.mouse_look) {
                 #[cfg(not(target="wasm32"))]
-                window.set_cursor_lock_mode(false);
+                window.set_cursor_grab_mode(CursorGrabMode::None);
                 window.set_cursor_visibility(true);
             }
             if mouse_input.pressed(controller.mouse_look) {
